@@ -28,46 +28,49 @@ for var in "$@"
 do
     arrARG=(${var//=/ })
 
-    if [ "${arrARG[0]}" = "--ffmpeg" ]; then
-        if [ "${arrARG[1]}" = "on" ]; then
+    arg="${arrARG[0]#"${arrARG[0]%%[![:space:]]*}"}"
+    value="${arrARG[1]#"${arrARG[0]%%[![:space:]]*}"}"
+
+    if [ "$arg" = "--ffmpeg" ]; then
+        if [ "$value" = "on" ]; then
             use_ffmpeg=true
-        elif [ "${arrARG[1]}" != "off" ]; then
-            echo "Unrecognized value for ffmpeg argument expected: on/off!"
+        elif [ "$value" != "off" ]; then
+            echo "Unrecognized value: $value for ffmpeg argument expected: on/off!"
             exit 3
         fi
-    elif [ "${arrARG[0]}" = "--cuda" ]; then
-        if [ "${arrARG[1]}" = "on" ]; then
+    elif [ "$arg" = "--cuda" ]; then
+        if [ "$value" = "on" ]; then
             use_cuda=true
-        elif [ "${arrARG[1]}" != "off" ]; then
-            echo "Unrecognized value for cuda argument expected: on/off!"
+        elif [ "$value" != "off" ]; then
+            echo "Unrecognized value: $value for cuda argument expected: on/off!"
             exit 3
         fi
-    elif [ "${arrARG[0]}" = "--cudnn" ]; then
-        if [ "${arrARG[1]}" = "on" ]; then
+    elif [ "$arg" = "--cudnn" ]; then
+        if [ "$value" = "on" ]; then
             use_cudnn=true
-        elif [ "${arrARG[1]}" != "off" ]; then
-            echo "Unrecognized value for cudnn argument expected: on/off!"
+        elif [ "$value" != "off" ]; then
+            echo "Unrecognized value: $value for cudnn argument expected: on/off!"
             exit 3
         fi
-    elif [ "${arrARG[0]}" = "--gstreamer" ]; then
-        if [ "${arrARG[1]}" = "on" ]; then
+    elif [ "$arg" = "--gstreamer" ]; then
+        if [ "$value" = "on" ]; then
             use_gstreamer=true
-        elif [ "${arrARG[1]}" != "off" ]; then
-            echo "Unrecognized value for gstreamer argument expected: on/off!"
+        elif [ "$value" != "off" ]; then
+            echo "Unrecognized value: $value for gstreamer argument expected: on/off!"
             exit 3
         fi
-    elif [ "${arrARG[0]}" = "--cuda_arch" ]; then
-        cuda_arch="${arrARG[1]}"
-    elif [ "${arrARG[0]}" = "--cudnn_include_dir" ]; then
-        cudnn_include_dir="${arrARG[1]}"
-    elif [ "${arrARG[0]}" = "--cudnn_library_path" ]; then
-        cudnn_library_path="${arrARG[1]}"
-    elif [ "${arrARG[0]}" = "--help" ]; then
+    elif [ "$arg" = "--cuda_arch" ]; then
+        cuda_arch="$value"
+    elif [ "$arg" = "--cudnn_include_dir" ]; then
+        cudnn_include_dir="$value"
+    elif [ "$arg" = "--cudnn_library_path" ]; then
+        cudnn_library_path="$value"
+    elif [ "$arg" = "--help" ]; then
         display_help
 
         exit 0
     else
-        echo "Unrecognized argument: ${arrARG[0]}!"
+        echo "Unrecognized argument: $arg!"
 
         display_help
 
@@ -96,30 +99,43 @@ if $use_gstreamer; then
     cmake_args="$cmake_args -D WITH_GSTREAMER=ON"
 fi
 
+log_file=/tmp/config_logs.txt
+
 #Config OpenCV
-if ! cmake $cmake_args; then
+if ! cmake $cmake_args | tee $log_file; then
     echo "Configuration failed!"
 
     exit 1
 fi
 
+check() {  # check <label> <regex>
+    if ! grep -Eq "$2" "$info"; then
+        echo "ERROR: $1 is not enabled" >&2
+        return 1
+    fi
+}
+
+ls "$info"
+
+echo "has ffmpeg: " "$(check "FFmpeg" '^\s*FFMPEG:\s+YES')"
+
 #Check OpenCV's required modules
-if $use_ffmpeg and ! grep -q '^#define HAVE_FFMPEG' build/cvconfig.h; then
+if $use_ffmpeg and ! check "FFmpeg" '^\s*FFMPEG:\s+YES'; then
     echo "ERROR: OpenCV was configured without FFmpeg support." >&2
 
     exit 1
 fi
-if $use_cuda and ! grep -q '^#define HAVE_CUDA' build/cvconfig.h; then
+if $use_cuda and ! check "CUDA" '^\s*NVIDIA CUDA:\s+YES'; then
     echo "ERROR: OpenCV was configured without CUDA support." >&2
 
     exit 1
 fi
-if $use_cudnn and ! grep -q '^#define HAVE_CUDNN' build/cvconfig.h; then
+if $use_cudnn and ! check "cuDNN" '^\s*cuDNN:\s+YES'; then
     echo "ERROR: OpenCV was configured without CuDNN support." >&2
 
     exit 1
 fi
-if $use_gstreamer and ! grep -q '^#define HAVE_GSTREAMER' build/cvconfig.h; then
+if $use_gstreamer and ! check "GStreamer" '^\s*GStreamer:\s+YES'; then
     echo "ERROR: OpenCV was configured without GStreamer support." >&2
 
     exit 1
