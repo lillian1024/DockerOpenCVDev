@@ -108,38 +108,38 @@ if ! cmake $cmake_args | tee $log_file; then
     exit 1
 fi
 
-check() {  # check <label> <regex>
-    if ! grep -Eq "$2" "$info"; then
-        echo "ERROR: $1 is not enabled" >&2
-        return 1
-    fi
-}
-
-ls "$info"
-
-echo "has ffmpeg: " "$(check "FFmpeg" '^\s*FFMPEG:\s+YES')"
+grep -Eq 'FFMPEG:[ \t]*YES' "$log_file"
+has_ffmpeg=$?
+grep -Eq 'CUDA:[ \t]*YES' "$log_file"
+has_cuda=$?
+grep -Eq 'CuDNN:[ \t]*YES' "$log_file"
+has_cudnn=$?
+grep -Eq 'GStreamer:[ \t]*YES' "$log_file"
+has_gstreamer=$?
 
 #Check OpenCV's required modules
-if $use_ffmpeg and ! check "FFmpeg" '^\s*FFMPEG:\s+YES'; then
+if $use_ffmpeg && [ $has_ffmpeg -ne 0 ]; then
     echo "ERROR: OpenCV was configured without FFmpeg support." >&2
 
     exit 1
 fi
-if $use_cuda and ! check "CUDA" '^\s*NVIDIA CUDA:\s+YES'; then
+if $use_cuda && [ $has_cuda -ne 0 ]; then
     echo "ERROR: OpenCV was configured without CUDA support." >&2
 
     exit 1
 fi
-if $use_cudnn and ! check "cuDNN" '^\s*cuDNN:\s+YES'; then
+if $use_cudnn && [ $has_cudnn -ne 0 ]; then
     echo "ERROR: OpenCV was configured without CuDNN support." >&2
 
     exit 1
 fi
-if $use_gstreamer and ! check "GStreamer" '^\s*GStreamer:\s+YES'; then
+if $use_gstreamer && [ $has_gstreamer -ne 0 ]; then
     echo "ERROR: OpenCV was configured without GStreamer support." >&2
 
     exit 1
 fi
+
+rm $log_file
 
 echo "OpenCV configured successfully!"
 
