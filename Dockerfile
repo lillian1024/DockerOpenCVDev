@@ -1,12 +1,12 @@
 FROM ubuntu:latest
 
-RUN ["apt", "update"]
-RUN ["apt", "upgrade", "-y"]
+RUN ["apt-get", "update"]
+RUN ["apt-get", "upgrade", "-y"]
 
 #Install dependencies
-RUN ["apt", "install", "-y", "cmake", "g++", "git", "wget", "unzip"]
+RUN ["apt-get", "install", "-y", "cmake", "g++", "git", "wget", "unzip", "pkg-config"]
 
-RUN ["apt", "install", "-y", "ffmpeg", "libavcodec-dev", "libavformat-dev", "libavutil-dev", "libswscale-dev"]
+RUN ["apt-get", "install", "-y", "ffmpeg", "libavcodec-dev", "libavformat-dev", "libavutil-dev", "libswscale-dev"]
 
 #Download and setup OpenCV sources
 WORKDIR /app/opencv-src
@@ -26,7 +26,7 @@ WORKDIR /app/opencv-src/opencv-4.x
 COPY config_opencv.sh /app/opencv-src/config_opencv.sh
 
 #RUN ["chmod", "u+x", "/app/opencv-src/config_opencv.sh"]
-RUN ["/bin/sh", "/app/opencv-src/config_opencv.sh", "--ffmpeg"]
+RUN ["/bin/bash", "/app/opencv-src/config_opencv.sh", "--ffmpeg=on", "--cuda=on", "--cudnn=on", "--cuda_arch=8.6"]
 
 #Build OpenCV
 RUN ["cmake", "--build", "build", "-j", "18"]
