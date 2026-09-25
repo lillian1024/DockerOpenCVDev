@@ -6,9 +6,10 @@ use_cudnn=false
 use_gstreamer=false
 
 cuda_arch="8.6"
+opencv_major_version="4"
 
-cudnn_include_dir="/usr/local/cuda/include"
-cudnn_library_path="/usr/local/cuda/lib64/libcudnn.so"
+cudnn_include_dir="/usr/include/x86_64-linux-gnu"
+cudnn_library_path="/usr/lib/x86_64-linux-gnu/libcudnn.so"
 
 display_help() {
     echo "Usage: script [arguments]"
@@ -22,6 +23,8 @@ display_help() {
     echo -e "\t--cuda_arch=<arch_version> : specify the architecture version of cuda, arch_version example: 8.6"
     echo -e "\t--cudnn_include_dir=<path> : path to cudnn include directory"
     echo -e "\t--cudnn_library_path=<path> : path to cudnn library"
+
+    echo -e "\t--opencv_major_version=<version> : major version of opencv to use, <version>: 4/5"
 }
 
 for var in "$@"
@@ -65,6 +68,8 @@ do
         cudnn_include_dir="$value"
     elif [ "$arg" = "--cudnn_library_path" ]; then
         cudnn_library_path="$value"
+    elif [ "$arg" = "--opencv_major_version" ]; then
+        opencv_major_version="$value"
     elif [ "$arg" = "--help" ]; then
         display_help
 
@@ -84,7 +89,7 @@ if $use_ffmpeg; then
     cmake_args="$cmake_args -D WITH_FFMPEG=ON"
 fi
 if $use_cuda; then
-    cmake_args="$cmake_args -D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules -D WITH_CUDA=ON -D ENABLE_FAST_MATH=ON -D CUDA_FAST_MATH=ON -D WITH_CUBLAS=ON -D CUDA_ARCH_BIN=$cuda_arch "
+    cmake_args="$cmake_args -D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib-${opencv_major_version}.x/modules -D WITH_CUDA=ON -D ENABLE_FAST_MATH=ON -D CUDA_FAST_MATH=ON -D WITH_CUBLAS=ON -D CUDA_ARCH_BIN=$cuda_arch -D BUILD_opencv_cudev=ON"
 fi
 if $use_cudnn; then
     if ! $use_cuda; then
@@ -110,9 +115,9 @@ fi
 
 grep -Eq 'FFMPEG:[ \t]*YES' "$log_file"
 has_ffmpeg=$?
-grep -Eq 'CUDA:[ \t]*YES' "$log_file"
+grep -Eq 'NVIDIA CUDA:[ \t]*YES' "$log_file"
 has_cuda=$?
-grep -Eq 'CuDNN:[ \t]*YES' "$log_file"
+grep -Eq 'cuDNN:[ \t]*YES' "$log_file"
 has_cudnn=$?
 grep -Eq 'GStreamer:[ \t]*YES' "$log_file"
 has_gstreamer=$?
