@@ -45,3 +45,5 @@ RUN /bin/bash /app/opencv-src/config_opencv.sh --ffmpeg=${USE_FFMPEG} --gstreame
 
 #Build OpenCV
 RUN ["cmake", "--build", "build", "-j", "18"]
+
+RUN ["make", "-C", "build", "install"]
