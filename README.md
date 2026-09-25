@@ -34,10 +34,10 @@ This project is kept lightweight and minimal:
 
 | Module | CMake Flag / Variable | Description |
 | :--- | :--- | :--- |
-| **FFmpeg** | `WITH_FFMPEG` | Video decoding/encoding backend |
-| **GStreamer** | `WITH_GSTREAMER` | Pipeline-based multimedia framework |
-| **CUDA** | `WITH_CUDA` | NVIDIA GPU acceleration |
-| **cuDNN** | `WITH_CUDNN` | NVIDIA Deep Neural Network library for CUDA |
+| **FFmpeg** | `USE_FFMPEG` | Video decoding/encoding backend |
+| **GStreamer** | `USE_GSTREAMER` | Pipeline-based multimedia framework |
+| **CUDA** | `USE_CUDA` | NVIDIA GPU acceleration |
+| **cuDNN** | `USE_CUDNN` | NVIDIA Deep Neural Network library for CUDA |
 
 ---
 
