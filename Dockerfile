@@ -41,7 +41,7 @@ WORKDIR /app/opencv-src/opencv-${OPENCV_VERSION}
 COPY config_opencv.sh /app/opencv-src/config_opencv.sh
 
 #RUN ["chmod", "u+x", "/app/opencv-src/config_opencv.sh"]
-RUN /bin/bash /app/opencv-src/config_opencv.sh --ffmpeg=${USE_FFMPEG} --gstreamer=${USE_GSTREAMER} --cuda=${USE_CUDA} --cudnn=${USE_CUDNN} --cuda_arch=${CUDA_ARCH} --opencv_major_version=${OPENCV_VERSION}
+RUN /bin/bash /app/opencv-src/config_opencv.sh --ffmpeg=${USE_FFMPEG} --gstreamer=${USE_GSTREAMER} --cuda=${USE_CUDA} --cudnn=${USE_CUDNN} --cuda_arch=${CUDA_ARCH} --opencv_version=${OPENCV_VERSION}
 
 #Build OpenCV
 RUN ["cmake", "--build", "build", "-j", "18"]

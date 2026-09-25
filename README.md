@@ -58,10 +58,11 @@ You can pass build arguments to customize the OpenCV version and enabled modules
 ```bash
 # Build OpenCV with CUDA and FFmpeg support
 docker build \
-  --build-arg OPENCV_VERSION=4.10.0 \
+  --build-arg OPENCV_VERSION=4.x \
   --build-arg USE_FFMPEG=on \
   --build-arg USE_CUDA=on \
   --build-arg USE_CUDNN=on \
+  --build-arg BASE_IMAGE=nvidia/cuda:13.4.1-cudnn-devel-ubuntu26.04 \
   -t my-custom-opencv .
 ```
 
