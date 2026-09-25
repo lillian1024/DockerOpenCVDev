@@ -4,6 +4,7 @@ ARG USE_CUDA=off
 ARG CUDA_ARCH=8.6
 ARG USE_CUDNN=off
 ARG BASE_IMAGE=ubuntu:latest
+ARG OPENCV_MAJ_VERSION=4
 
 FROM ${BASE_IMAGE}
 
@@ -12,6 +13,7 @@ ARG USE_GSTREAMER
 ARG USE_CUDA
 ARG CUDA_ARCH
 ARG USE_CUDNN
+ARG OPENCV_MAJ_VERSION
 
 RUN ["apt-get", "update"]
 RUN ["apt-get", "upgrade", "-y"]
@@ -39,7 +41,7 @@ WORKDIR /app/opencv-src/opencv-4.x
 COPY config_opencv.sh /app/opencv-src/config_opencv.sh
 
 #RUN ["chmod", "u+x", "/app/opencv-src/config_opencv.sh"]
-RUN /bin/bash /app/opencv-src/config_opencv.sh --ffmpeg=${USE_FFMPEG} --gstreamer=${USE_GSTREAMER} --cuda=${USE_CUDA} --cudnn=${USE_CUDNN} --cuda_arch=${CUDA_ARCH}
+RUN /bin/bash /app/opencv-src/config_opencv.sh --ffmpeg=${USE_FFMPEG} --gstreamer=${USE_GSTREAMER} --cuda=${USE_CUDA} --cudnn=${USE_CUDNN} --cuda_arch=${CUDA_ARCH} --opencv_major_version=${OPENCV_MAJ_VERSION}
 
 #Build OpenCV
 RUN ["cmake", "--build", "build", "-j", "18"]
