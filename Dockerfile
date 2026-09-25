@@ -26,8 +26,8 @@ RUN ["apt-get", "install", "-y", "ffmpeg", "libavcodec-dev", "libavformat-dev", 
 #Download and setup OpenCV sources
 WORKDIR /app/opencv-src
 
-RUN ["wget", "-O", "opencv.zip", "https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip"]
-RUN ["wget", "-O", "opencv_contrib.zip", "https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip"]
+RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
+RUN wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
 
 RUN ["unzip", "opencv.zip"]
 RUN ["unzip", "opencv_contrib.zip"]

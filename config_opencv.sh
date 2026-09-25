@@ -24,7 +24,7 @@ display_help() {
     echo -e "\t--cudnn_include_dir=<path> : path to cudnn include directory"
     echo -e "\t--cudnn_library_path=<path> : path to cudnn library"
 
-    echo -e "\t--opencv_version=<version> : major version of opencv to use, <version>: 4.x/5.x"
+    echo -e "\t--opencv_version=<version> : major version of opencv to use, <version>: 4.x/5.x/4.10.0"
 }
 
 for var in "$@"
